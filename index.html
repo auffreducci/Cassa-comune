@@ -27,7 +27,7 @@
   .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .btn { border: none; border-radius: 10px; padding: 8px 14px; font-size: .85rem;
     font-weight: 600; cursor: pointer; transition: transform .1s, opacity .2s;
-    display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+    display: inline-flex; align-items: center; gap: 6px; }
   .btn:active { transform: scale(.97); }
   .btn-ghost { background: var(--card); color: var(--text); border: 1px solid var(--border); }
   .btn-primary { background: var(--demaggi); color: #fff; }
@@ -112,10 +112,6 @@
     font-size: .95rem; padding: 4px; border-radius: 6px; color: var(--muted); }
   .expense .actions button:hover { background: var(--border); color: var(--text); }
 
-  .product a { color: inherit; text-decoration: none;
-    border-bottom: 1px dashed var(--muted); transition: border-color .15s, color .15s; }
-  .product a:hover { border-bottom-color: var(--demaggi); color: var(--demaggi); }
-
   .empty { text-align: center; color: var(--muted); padding: 40px 0; font-size: .9rem; }
 
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
@@ -128,11 +124,6 @@
   .settings-card input { width: 100%; }
   .settings-card .field { margin-bottom: 10px; }
   .settings-card a { color: #b45309; }
-
-  .config-warning { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b;
-    border-radius: 12px; padding: 16px; margin-bottom: 20px; font-size: .85rem; }
-  .config-warning strong { display: block; margin-bottom: 6px; }
-  .config-warning code { background: #fee2e2; padding: 2px 6px; border-radius: 4px; font-size: .8rem; }
 
   @media (max-width: 600px) {
     .expense .date { display: none; }
@@ -154,12 +145,6 @@
       <button class="btn btn-ghost" id="settingsBtn">⚙️ Sincronizza</button>
     </div>
   </header>
-
-  <div class="config-warning" id="configWarning" style="display:none;">
-    <strong>⚠️ Configurazione di sincronizzazione mancante</strong>
-    Apri il file HTML e sostituisci i valori di <code>HARDCODED_CONFIG</code>
-    con il tuo <strong>6afacaf2ac6210605a8b5690</strong> e la tua <strong>$2a$10$IPOPeofbmT/M9b6j/OJMTe//vrrrzq3ypb/fdKUTGqSxzXNWrdc5u</strong> di JSONBin.
-  </div>
 
   <div class="summary">
     <div class="summary-grid">
@@ -204,10 +189,6 @@
           <label>Importo reale (€)</label>
           <input type="number" id="fAmount" step="0.01" min="0.01" placeholder="0,00" required>
         </div>
-        <div class="field">
-          <label>Link (opzionale)</label>
-          <input type="url" id="fLink" placeholder="https://...">
-        </div>
       </div>
       <div class="field" style="margin-bottom:6px;">
         <label style="margin-bottom:6px;display:block;">Come va addebitata?</label>
@@ -241,7 +222,7 @@
       <input type="text" id="cfgBinId" placeholder="es. 65f1a2b3c4d5e6f7a8b9c0d1">
     </div>
     <div class="field">
-      <label>API Key (Master Key)</label>
+      <label>API Key (Master Key o Access Key)</label>
       <input type="password" id="cfgApiKey" placeholder="$2a$10$...">
     </div>
     <div class="form-actions">
@@ -262,15 +243,9 @@
   // ============================================================
   // 🔧 CONFIGURAZIONE HARDCODED — SOSTITUISCI QUI I TUOI VALORI
   // ============================================================
-  // 1. Crea un Bin su https://jsonbin.io con contenuto {"init": true}
-  // 2. Copia il Bin ID (es. "65f1a2b3c4d5e6f7a8b9c0d1")
-  // 3. Copia la Master Key (es. "$2a$10$...")
-  // 4. Incolla i valori qui sotto, tra le virgolette
-  // 5. Salva il file e caricalo su GitHub Pages
-  // ============================================================
   const HARDCODED_CONFIG = {
-    binId: '',   // ← INCOLLA QUI IL BIN ID
-    apiKey: ''   // ← INCOLLA QUI LA MASTER KEY
+    binId: '6afac94b99f2e6510825ce92',
+    apiKey: '$2a$10$kITFuB4O12eIZb7SnbzDOu8ljIw1oDV5u.BGIOCxgwoaz0mv0iJIK'
   };
   // ============================================================
 
@@ -322,12 +297,56 @@
     document.getElementById('syncLabel').textContent = label;
   }
 
+  // ---------- STORICO PRECARICATO ----------
+  function seedHistory() {
+    const S = [
+      ['2025-01-01','Uffreducci','Residuo precedente cassa',38,   'meta'],
+      ['2025-10-26','Uffreducci','Arance',50,                    'meta'],
+      ['2025-11-14','De Maggi','Vino',136,                        'meta'],
+      ['2025-11-16','Uffreducci','Arance+Avocado',57.9,           'meta'],
+      ['2025-11-16','Uffreducci','Clementine (solo per De Maggi)',29,'demaggi'],
+      ['2025-12-14','Uffreducci','Clementine (solo per De Maggi)',31,'demaggi'],
+      ['2025-12-14','Uffreducci','Arance',46,                    'meta'],
+      ['2026-01-11','Uffreducci','Clementine (solo per De Maggi)',31,'demaggi'],
+      ['2026-01-11','Uffreducci','Arance+Avocado',57.9,           'meta'],
+      ['2026-01-11','De Maggi','Residuo spese capodanno',80,      'meta'],
+      ['2026-02-26','Uffreducci','Arance',58,                    'meta'],
+      ['2026-04-26','Uffreducci','Cinema Adriano',42,            'meta'],
+      ['2026-05-14','De Maggi','Champagne',540,                  'meta'],
+      ['2026-05-22','Uffreducci',"Cena L'Elementare",117.5,      'meta'],
+      ['2026-07-12','De Maggi','Vino',120,                        'meta'],
+      ['2026-10-23','Uffreducci','Cena Dogma',352,               'meta'],
+      ['2026-11-06','Uffreducci','Arance',57,                    'meta'],
+      ['2026-11-15','Uffreducci','Biglietti domus romana',40,    'meta'],
+      ['2026-11-15','De Maggi','Pranzo De Santis',150,            'meta']
+    ];
+    return S.map(([date, payer, product, amount, splitMode], i) => ({
+      id: 'seed-' + i,
+      date, payer, product,
+      amount: Number(amount),
+      splitMode,
+      updatedAt: Date.now() + i
+    }));
+  }
+
+  // MODIFICATO: pulizia dati non validi + fallback storico
   function loadLocal() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) expenses = JSON.parse(raw);
     } catch (e) { expenses = []; }
     if (!Array.isArray(expenses)) expenses = [];
+
+    // Pulisci eventuali oggetti non validi (es. {"init": true} pushati per errore)
+    expenses = expenses.filter(e =>
+      e && typeof e === 'object' && e.id && e.date && e.product && typeof e.amount === 'number'
+    );
+
+    // Se dopo la pulizia non c'è nulla, carica lo storico
+    if (expenses.length === 0) {
+      expenses = seedHistory();
+      saveLocal();
+    }
 
     let storedConfig = null;
     try {
@@ -342,12 +361,6 @@
       config = storedConfig;
     } else {
       config = { binId: '', apiKey: '' };
-    }
-
-    // Mostra avviso se config mancante
-    if (!config.binId || !config.apiKey) {
-      const w = document.getElementById('configWarning');
-      if (w) w.style.display = 'block';
     }
   }
 
@@ -410,14 +423,6 @@
     }
   }
 
-  function renderProduct(e) {
-    const name = escapeHtml(e.product);
-    if (e.link) {
-      return `<a href="${escapeHtml(e.link)}" target="_blank" rel="noopener" title="Apri link">${name} ↗</a>`;
-    }
-    return name;
-  }
-
   function renderList() {
     const container = document.getElementById('list');
     if (expenses.length === 0) {
@@ -443,7 +448,7 @@
         html += `
           <div class="expense ${payerCls}">
             <div class="date">${formatDate(e.date)}</div>
-            <div class="product">${renderProduct(e)}<span class="tag ${tagCls}">${tagTxt}</span></div>
+            <div class="product">${escapeHtml(e.product)}<span class="tag ${tagCls}">${tagTxt}</span></div>
             <div class="amount">${fmt(e.amount)}<small>pagato da ${e.payer}</small></div>
             <div class="actions">
               <button title="Modifica" data-edit="${e.id}">✏️</button>
@@ -499,7 +504,6 @@
     document.getElementById('fPayer').value = e.payer;
     document.getElementById('fProduct').value = e.product;
     document.getElementById('fAmount').value = e.amount;
-    document.getElementById('fLink').value = e.link || '';
     setMode(e.splitMode || 'meta');
     document.getElementById('submitBtn').textContent = 'Salva modifica';
     document.getElementById('fProduct').focus();
@@ -512,14 +516,13 @@
     const payer = document.getElementById('fPayer').value;
     const product = document.getElementById('fProduct').value.trim();
     const amount = parseFloat(document.getElementById('fAmount').value);
-    const link = document.getElementById('fLink').value.trim();
     if (!date || !product || !(amount > 0)) { toast('Compila tutti i campi'); return; }
     if (editingId) {
       const idx = expenses.findIndex(x => x.id === editingId);
-      if (idx >= 0) expenses[idx] = { ...expenses[idx], date, payer, product, amount, link, splitMode: currentMode, updatedAt: Date.now() };
+      if (idx >= 0) expenses[idx] = { ...expenses[idx], date, payer, product, amount, splitMode: currentMode, updatedAt: Date.now() };
       toast('Spesa modificata');
     } else {
-      expenses.push({ id: crypto.randomUUID(), date, payer, product, amount, link, splitMode: currentMode, updatedAt: Date.now() });
+      expenses.push({ id: crypto.randomUUID(), date, payer, product, amount, splitMode: currentMode, updatedAt: Date.now() });
       toast('Spesa aggiunta');
     }
     saveLocal(); renderList(); renderSummary(); resetForm(); scheduleSync();
@@ -539,6 +542,7 @@
     }
   }
 
+  // MODIFICATO: se il remoto non è un array, restituisce [] invece di lanciare errore
   async function pullRemote() {
     if (!config.binId || !config.apiKey) return null;
     const res = await fetch(`${JSONBIN_BASE}/${config.binId}/latest`, {
@@ -547,8 +551,11 @@
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
     const data = json.record;
-    if (!Array.isArray(data)) throw new Error('Formato remoto non valido');
-    return data;
+    if (!Array.isArray(data)) return [];
+    // Filtra eventuali oggetti non validi
+    return data.filter(e =>
+      e && typeof e === 'object' && e.id && e.date && e.product && typeof e.amount === 'number'
+    );
   }
 
   async function pushRemote(list) {
@@ -650,45 +657,8 @@
     document.getElementById('settingsPanel').style.display = 'none';
   };
 
-  function seedHistory() {
-    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1QpBake2KcHYrelcKoNwbrnWZckN5QXDw/edit?gid=1163094413#gid=1163094413';
-    const S = [
-      ['2025-01-01','Uffreducci','Residuo precedente cassa',38,   'meta',  SHEET_URL],
-      ['2025-10-26','Uffreducci','Arance',50,                    'meta',  ''],
-      ['2025-11-14','De Maggi','Vino',136,                        'meta',  ''],
-      ['2025-11-16','Uffreducci','Arance+Avocado',57.9,           'meta',  ''],
-      ['2025-11-16','Uffreducci','Clementine (solo per De Maggi)',29,'demaggi',''],
-      ['2025-12-14','Uffreducci','Clementine (solo per De Maggi)',31,'demaggi',''],
-      ['2025-12-14','Uffreducci','Arance',46,                    'meta',  ''],
-      ['2026-01-11','Uffreducci','Clementine (solo per De Maggi)',31,'demaggi',''],
-      ['2026-01-11','Uffreducci','Arance+Avocado',57.9,           'meta',  ''],
-      ['2026-01-11','De Maggi','Residuo spese capodanno',80,      'meta',  ''],
-      ['2026-02-26','Uffreducci','Arance',58,                    'meta',  ''],
-      ['2026-04-26','Uffreducci','Cinema Adriano',42,            'meta',  ''],
-      ['2026-05-14','De Maggi','Champagne',540,                  'meta',  ''],
-      ['2026-05-22','Uffreducci',"Cena L'Elementare",117.5,      'meta',  ''],
-      ['2026-07-12','De Maggi','Vino',120,                        'meta',  ''],
-      ['2026-10-23','Uffreducci','Cena Dogma',352,               'meta',  ''],
-      ['2026-11-06','Uffreducci','Arance',57,                    'meta',  ''],
-      ['2026-11-15','Uffreducci','Biglietti domus romana',40,    'meta',  ''],
-      ['2026-11-15','De Maggi','Pranzo De Santis',150,            'meta',  '']
-    ];
-    return S.map(([date, payer, product, amount, splitMode, link], i) => ({
-      id: 'seed-' + i,
-      date, payer, product,
-      amount: Number(amount),
-      splitMode,
-      link: link || '',
-      updatedAt: Date.now() + i
-    }));
-  }
-
+  // ---------- INIT ----------
   loadLocal();
-  if (expenses.length === 0) {
-    expenses = seedHistory();
-    saveLocal();
-  }
-
   document.getElementById('fDate').value = todayISO();
   setMode('meta');
   renderSummary();
