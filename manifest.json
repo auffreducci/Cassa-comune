@@ -1,0 +1,20 @@
+{
+  "name": "Cassa Comune De Maggi - Uffreducci",
+  "short_name": "Cassa Comune",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192/6366f1/ffffff?text=CC",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512/6366f1/ffffff?text=CC",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
